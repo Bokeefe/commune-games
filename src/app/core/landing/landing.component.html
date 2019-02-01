@@ -1,0 +1,36 @@
+<form [formGroup]="landingForm" (keydown)="onKeydown($event)" (submit)="onSubmit()">
+  <div class="form-group">
+      <label for="currentTeams">Select from Current Teams</label>
+
+      <select formControlName="currentTeams"
+        class="form-control"
+        id="currentTeams">
+
+        <option *ngFor="let team of currentTeams | keyvalue"
+          value="{{team.gameId}}">{{team.key}}</option>
+      </select>
+  </div>
+  <div class="form-group">
+    <label for="teamName">New Team Name</label>
+
+    <input
+      formControlName="teamName"
+      type="text"
+      class="form-control"
+      id="teamName" aria-describedby="new team name"
+      placeholder="Enter a new team name if you don't see yours">
+  </div>
+
+  <div class="form-group">
+    <label for="callSign">Call Sign</label>
+
+    <input
+      formControlName="callSign"
+      type="text"
+      class="form-control"
+      id="callSign"
+      placeholder="The name you wish to go by">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
