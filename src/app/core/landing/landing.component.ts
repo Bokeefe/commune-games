@@ -1,10 +1,12 @@
+import { RoomService } from './../../shared/room.service';
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, Validators} from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn} from '@angular/forms';
 
 // services
 import { SocketService } from './../../shared/socket.service';
 import { Router } from '@angular/router';
+import { UserService } from 'src/app/shared/user.service';
 
 @Component({
   selector: 'app-landing',
@@ -12,62 +14,103 @@ import { Router } from '@angular/router';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnDestroy, OnInit {
-  currentTeams: any;
+  currentRooms: any;
+
+  errorMessages: any;
 
   landingForm: FormGroup;
 
   constructor(private _ioService: SocketService,
-              private router: Router) {
+              private _roomService: RoomService,
+              private router: Router,
+              private _userService: UserService) {
     this.initSubs();
     this.initForm();
+    this.errorMessages = {
+      currentRooms: '',
+      newRoom: '',
+      callSign: '',
+    };
   }
 
   onKeydown(event: any): void {
     if (event.keyCode === 13) {
-      this.onSubmit();
+      this.onSubmit('submit');
     }
   }
 
-  onSubmit(): void {
-    if (this.landingForm.valid) {
-      if (this.landingForm.value['teamName']) {
-        this.router.navigate(['room']);
+  onRoomSelect(event: any): void {
+    this._roomService.setCurrentRoom(event.target.value);
+  }
+
+  onSubmit(event: any): void {
+
+    if (this.landingForm.valid) {  
+      this._userService.setUser(this.landingForm.value['callSign']);
+      this.router.navigate(['room']);
+    } else {
+      for (const key in this.landingForm['controls']) {
+        if (this.landingForm['controls'].hasOwnProperty(key)) {
+          if (!!this.landingForm.controls[key].errors) {
+            this.setErrorMessage(key, 'You missed a required field');
+          }
+        }
       }
     }
+    
+  }
+
+  private customValidation(): ValidatorFn {
+    let isValid;
+
+    if (!!this.landingForm.value['currenRooms'].value && !!this.landingForm.value['newRoom'].value) {
+      this.setErrorMessage('currentRoom', 'please either create a new room OR an existing one');
+      isValid = false;
+    } else if (!!this.landingForm.value['currenRooms'].value && this.landingForm.value['newRoom'].value) {
+      isValid = true;
+    } else if (this.landingForm.value['currenRooms'].value && !!this.landingForm.value['newRoom'].value) {
+      isValid = true;
+    }
+
+    return isValid;
   }
 
   private initForm(): void {
     this.landingForm = new FormGroup({
-      currentTeams: new FormControl(''),
-      teamName: new FormControl(''),
+      currentRooms: new FormControl('', ),
+      newRoom: new FormControl('', ),
       callSign: new FormControl('', Validators.required)
     });
   }
 
   private initSubs(): void {
-    this._ioService.onCurrentTeamsChange$.subscribe(
-      data => this.setCurrentTeams(data)
+    this._ioService.onCurrentRoomsChange$.subscribe(
+      data => this.setCurrentRooms(data)
     );
   }
 
-  private setCurrentTeams(currentTeams: any): void {
-    this.currentTeams = {};
-    for (let key in currentTeams) {
-      if (currentTeams.hasOwnProperty(key) && !this.currentTeams.hasOwnProperty(key)) {
-        this.currentTeams[key] = currentTeams[key];
+  private setCurrentRooms(currentRooms: any): void {
+    this.currentRooms = {};
+    for (const key in currentRooms) {
+      if (currentRooms.hasOwnProperty(key) && !this.currentRooms.hasOwnProperty(key)) {
+        this.currentRooms[key] = currentRooms[key];
       }
     }
   }
 
+  private setErrorMessage(key: string, errorMessage: string): void {
+    this.errorMessages[key] = errorMessage;
+  }
+
   ngOnInit() {
     this.initSubs();
-    setTimeout(() => {
-      this._ioService.room('test');
-    }, 3000);
+    // setTimeout(() => {
+    //   this._ioService.initRoom('test');
+    // }, 3000);
   }
 
   ngOnDestroy() {
-    this._ioService.onCurrentTeamsChange$.unsubscribe();
+    this._ioService.onCurrentRoomsChange$.unsubscribe();
   }
 
 }

@@ -1,35 +1,27 @@
-<form [formGroup]="landingForm" (keydown)="onKeydown($event)" (submit)="onSubmit()">
-  <div class="form-group">
-      <label for="currentTeams">Select from Current Teams</label>
+<form [formGroup]="landingForm" (keydown)="onKeydown($event)" (submit)="onSubmit($event)">
+  <!-- <div *ngFor="let key of errorMessages">
+    <p>{{key.value}}</p>
+  </div> -->
+  <div class="form-group" [class]="errorMessages?.currentRooms ? 'alert alert-danger' : 'alert alert-light'">
+    <label for="currentRooms">Select from Current Teams</label>
 
-      <select formControlName="currentTeams"
-        class="form-control"
-        id="currentTeams">
+    <select (change)="onRoomSelect($event)" formControlName="currentRooms" class="form-control" id="currentRooms">
 
-        <option *ngFor="let team of currentTeams | keyvalue"
-          value="{{team.gameId}}">{{team.key}}</option>
-      </select>
+      <option value="">-- pick from current rooms --</option>
+      <option *ngFor="let room of currentRooms | keyvalue" [value]="room.key">{{room.key}}</option>
+    </select>
   </div>
-  <div class="form-group">
-    <label for="teamName">New Team Name</label>
+  <div class="form-group" [class]="errorMessages?.newRoom ? 'alert alert-danger' : 'alert alert-light'">
+    <label for="newRoom">New Team Name</label>
 
-    <input
-      formControlName="teamName"
-      type="text"
-      class="form-control"
-      id="teamName" aria-describedby="new team name"
+    <input formControlName="newRoom" type="text" class="form-control" id="newRoom" aria-describedby="new team name"
       placeholder="Enter a new team name if you don't see yours">
   </div>
 
-  <div class="form-group">
+  <div class="form-group" [class]="errorMessages?.callSign ? 'alert alert-danger' : 'alert alert-light'">
     <label for="callSign">Call Sign</label>
 
-    <input
-      formControlName="callSign"
-      type="text"
-      class="form-control"
-      id="callSign"
-      placeholder="The name you wish to go by">
+    <input formControlName="callSign" type="text" class="form-control" id="callSign" placeholder="The name you wish to go by">
   </div>
 
   <button type="submit" class="btn btn-primary">Submit</button>

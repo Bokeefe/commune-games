@@ -13,46 +13,52 @@ import { HttpClientService } from './http-client.service';
   providedIn: 'root'
 })
 export class SocketService {
-  @Output() onCurrentTeamsChange$: EventEmitter<any>;
+  @Output() onCurrentRoomsChange$: EventEmitter<any>;
 
-  currentTeams: any;
+  currentRooms: any;
 
   private url = 'http://localhost:3000';
+
+  private room;
 
   private socket;
 
   private socketId: string;
 
   constructor(private _http: HttpClientService) {
-    this.onCurrentTeamsChange$ = new EventEmitter();
+    this.onCurrentRoomsChange$ = new EventEmitter();
     this.initSocket();
     this.setSocketId();
-    this.setCurrentTeams([{name: 'dummy', gameId: 2}]);
+    this.setCurrentRooms([{name: 'dummy', gameId: 2}]);
   }
 
-  getCurrentTeams(): Observable<any> {
-    return of(this.currentTeams);
+  emit(path: string, data?: any): void {
+    this.socket.emit(path, data);
+  }
+
+  getCurrentRooms(): Observable<any> {
+    return of(this.currentRooms);
   }
 
   initSocket(): void {
     this.socket = io.connect(this.url);
 
-    this.socket.emit('getCurrentTeams');
+    this.socket.emit('getCurrentRooms');
 
-    this.socket.on('currentTeams', (teams) => {
-      this.onCurrentTeamsChange$.emit(teams);
-      this.setCurrentTeams(teams);
+    this.socket.on('currentRooms', (rooms) => {
+      this.onCurrentRoomsChange$.emit(rooms);
+      this.setCurrentRooms(rooms);
     });
   }
 
-  room(room: string): void {
-
-    console.log(room);
-    this.socket.join(room);
+  initRoom(room: any): void {
+    console.log('FE room:', room);
+    this.room = io(room);
+    this.room.join(room);
   }
 
-  private setCurrentTeams(currentTeams: Array<any>): void {
-    this.currentTeams = currentTeams;
+  private setCurrentRooms(currentRooms: Array<any>): void {
+    this.currentRooms = currentRooms;
   }
 
   private setSocketId(): void {

@@ -1,5 +1,7 @@
 # CommuneGames
 
+Developing various social games to play of socket.io rooms.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.3.
 
 ## Development server

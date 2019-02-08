@@ -12,7 +12,7 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname + '/dist/commune-games/index.html');
 });
 
-const currentTeams = {
+const currentRooms = {
   'cats': {
     gameId: 1,
     players: []
@@ -25,22 +25,26 @@ const currentTeams = {
 
 io.on('connection', (socket) => {
 
-  socket.on('getCurrentTeams', () => {
-    io.emit('currentTeams', currentTeams);
+  console.log('connected to main');
+
+  socket.on('getCurrentRooms', () => {
+    io.emit('currentRooms', currentRooms);
   });
 
-  var nsp = io.of('/test');
-
-  nsp.on('connection', function(socket){
-    console.log('someone connected to test room');
+  socket.on('joinRoom', (roomName) => {
+    console.log('joinRoom', roomName);
+    socket.join(roomName);
   });
 
-  nsp.emit('hi', 'everyone!');
+  socket.on('inRoom', (data) => {
+    console.log(data);
+  });
 
   socket.on('disconnect', () => {
-
+    console.log('a user disconnected');
   });
 });
+
 
 http.listen(3000, () => {
   console.log('listening on localhost:3000');

@@ -5,5 +5,15 @@ import { Injectable } from '@angular/core';
 })
 export class RoomService {
 
+  currentRoom: string;
+
   constructor() { }
+
+  getCurrentRoom(): string {
+    return this.currentRoom;
+  }
+
+  setCurrentRoom(room: string): void {
+    this.currentRoom = room;
+  }
 }
