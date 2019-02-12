@@ -1,4 +1,3 @@
-
 // angular
 import { EventEmitter, Injectable, Output } from '@angular/core';
 
@@ -51,10 +50,8 @@ export class SocketService {
     });
   }
 
-  initRoom(room: any): void {
-    console.log('FE room:', room);
-    this.room = io(room);
-    this.room.join(room);
+  initRoom(data: any): void {
+    this.socket.emit('inRoom', data);
   }
 
   private setCurrentRooms(currentRooms: Array<any>): void {

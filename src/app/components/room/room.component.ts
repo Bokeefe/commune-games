@@ -26,6 +26,8 @@ export class RoomComponent implements OnInit {
 
    private initRoom(): void {
     this._ioService.emit('joinRoom', this.roomName);
+
+    this._ioService.emit('inRoom', 'confused')
   }
 
   private setUser(user: string): void {

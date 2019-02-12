@@ -24,7 +24,6 @@ const currentRooms = {
 };
 
 io.on('connection', (socket) => {
-
   console.log('connected to main');
 
   socket.on('getCurrentRooms', () => {
@@ -38,13 +37,13 @@ io.on('connection', (socket) => {
 
   socket.on('inRoom', (data) => {
     console.log(data);
+    io.to('some room').emit(data);
   });
 
   socket.on('disconnect', () => {
     console.log('a user disconnected');
   });
 });
-
 
 http.listen(3000, () => {
   console.log('listening on localhost:3000');

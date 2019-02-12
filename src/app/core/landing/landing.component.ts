@@ -104,9 +104,6 @@ export class LandingComponent implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.initSubs();
-    // setTimeout(() => {
-    //   this._ioService.initRoom('test');
-    // }, 3000);
   }
 
   ngOnDestroy() {
