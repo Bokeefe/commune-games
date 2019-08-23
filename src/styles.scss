@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+$black : rgb(29, 29, 29);
+$grey: grey;
+body {
+    background: $black !important;
+    color: $grey !important;
+}
+
+.alert-light {
+    background: $black !important;
+    select,input{
+        background: $black !important;
+
+    }
+}
+.btn {
+    background: $black !important;
+}

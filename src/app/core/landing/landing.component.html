@@ -8,7 +8,7 @@
     <select (change)="onRoomSelect($event)" formControlName="currentRooms" class="form-control" id="currentRooms">
 
       <option value="">-- pick from current rooms --</option>
-      <option *ngFor="let room of currentRooms | keyvalue" [value]="room.key">{{room.key}}</option>
+      <option *ngFor="let room of currentRooms" [value]="room">{{room}}</option>
     </select>
   </div>
   <div class="form-group" [class]="errorMessages?.newRoom ? 'alert alert-danger' : 'alert alert-light'">

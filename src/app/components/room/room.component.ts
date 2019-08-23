@@ -1,8 +1,10 @@
 import { RoomService } from './../../shared/room.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from 'src/app/shared/user.service';
 import { SocketService } from 'src/app/shared/socket.service';
 import * as io from 'socket.io-client';
+import { HttpClient } from 'selenium-webdriver/http';
+import { HttpClientService } from 'src/app/shared/http-client.service';
 
 @Component({
   selector: 'app-room',
@@ -12,22 +14,38 @@ import * as io from 'socket.io-client';
 export class RoomComponent implements OnInit {
 
   roomName: string;
-
-  roomSocket: any;
-
+  room: any;
+  players: any;
+  nsp: any;
   user: string;
+  socket: any;
 
-  constructor(private _roomService: RoomService,
+  constructor(private _http: HttpClientService,
+              private _roomService: RoomService,
               private _ioService: SocketService,
               private _userService: UserService) {
       this.setRoom(this._roomService.getCurrentRoom());
       this.setUser(this._userService.getUser());
+      this.roomName = this._roomService.getCurrentRoom();
    }
 
-   private initRoom(): void {
-    this._ioService.emit('joinRoom', this.roomName);
+  ngOnInit() {
+    this._ioService.getSocket().subscribe((socket) => {
+      this.socket = socket;
+    });
 
-    this._ioService.emit('inRoom', 'confused')
+    this.socket.on('updateRoom', (room) => {
+      this.room = room;
+      this.players = room.players;
+    });
+    
+    this.socket.on('testRoom', (msg) => {
+      console.log(msg);
+    });
+  }
+
+  test(): void {
+    this.socket.emit('test', 'eaxample');
   }
 
   private setUser(user: string): void {
@@ -37,9 +55,4 @@ export class RoomComponent implements OnInit {
   private setRoom(roomName: string): void {
     this.roomName = roomName;
   }
-
-  ngOnInit() {
-    this.initRoom();
-  }
-
 }

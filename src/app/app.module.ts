@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 
 // libraries
 import { CoreModule } from './core/core.module';
-import { RoomComponent } from './components/room/room.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +22,6 @@ import { RoomComponent } from './components/room/room.component';
   ],
   providers: [
     { provide: APP_BASE_HREF, useValue: '/' }
-
   ],
   bootstrap: [AppComponent]
 })

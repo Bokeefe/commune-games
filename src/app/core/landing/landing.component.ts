@@ -13,24 +13,34 @@ import { UserService } from 'src/app/shared/user.service';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent implements OnDestroy, OnInit {
+export class LandingComponent implements OnInit {
   currentRooms: any;
 
   errorMessages: any;
 
   landingForm: FormGroup;
+  socket: any;
 
   constructor(private _ioService: SocketService,
               private _roomService: RoomService,
               private router: Router,
               private _userService: UserService) {
-    this.initSubs();
     this.initForm();
     this.errorMessages = {
       currentRooms: '',
       newRoom: '',
       callSign: '',
     };
+  }
+
+  ngOnInit() {
+    this._ioService.getSocket().subscribe((socket) => {this.socket = socket; });
+    this.socket.emit('getCurrentRooms');
+    this.socket.on('currentRooms', (currentRooms) => {
+      console.log(currentRooms)
+      this.currentRooms = currentRooms;
+    });
+
   }
 
   onKeydown(event: any): void {
@@ -44,9 +54,29 @@ export class LandingComponent implements OnDestroy, OnInit {
   }
 
   onSubmit(event: any): void {
+    if (this.landingForm.valid && !this.landingForm.value['newRoom']) {
+      console.log('existing room');
 
-    if (this.landingForm.valid) {  
-      this._userService.setUser(this.landingForm.value['callSign']);
+      const roomObj = {
+        roomName: this.landingForm.value['currentRooms'],
+        callSign: this.landingForm.value['callSign']
+      };
+
+      console.log(roomObj);
+      this._ioService.emit('addPlayer', roomObj);
+      this._roomService.setCurrentRoom(roomObj.roomName);
+      this.router.navigate(['room']);
+    } else if (this.landingForm.valid && this.landingForm.value['newRoom']) {
+      console.log('new room');
+
+      const roomObj = {
+        roomName: this.landingForm.value['newRoom'],
+        callSign: this.landingForm.value['callSign']
+      };
+
+      this._ioService.emit('joinRoom', roomObj );
+      this._roomService.setCurrentRoom(roomObj.roomName);
+      this._userService.setUser(roomObj.callSign);
       this.router.navigate(['room']);
     } else {
       for (const key in this.landingForm['controls']) {
@@ -57,7 +87,6 @@ export class LandingComponent implements OnDestroy, OnInit {
         }
       }
     }
-    
   }
 
   private customValidation(): ValidatorFn {
@@ -83,12 +112,6 @@ export class LandingComponent implements OnDestroy, OnInit {
     });
   }
 
-  private initSubs(): void {
-    this._ioService.onCurrentRoomsChange$.subscribe(
-      data => this.setCurrentRooms(data)
-    );
-  }
-
   private setCurrentRooms(currentRooms: any): void {
     this.currentRooms = {};
     for (const key in currentRooms) {
@@ -101,13 +124,4 @@ export class LandingComponent implements OnDestroy, OnInit {
   private setErrorMessage(key: string, errorMessage: string): void {
     this.errorMessages[key] = errorMessage;
   }
-
-  ngOnInit() {
-    this.initSubs();
-  }
-
-  ngOnDestroy() {
-    this._ioService.onCurrentRoomsChange$.unsubscribe();
-  }
-
 }

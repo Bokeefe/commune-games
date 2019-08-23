@@ -12,42 +12,37 @@ import { HttpClientService } from './http-client.service';
   providedIn: 'root'
 })
 export class SocketService {
-  @Output() onCurrentRoomsChange$: EventEmitter<any>;
-
   currentRooms: any;
+  nsp: any;
 
   private url = 'http://localhost:3000';
-
-  private room;
-
-  private socket;
-
-  private socketId: string;
+  socket;
 
   constructor(private _http: HttpClientService) {
-    this.onCurrentRoomsChange$ = new EventEmitter();
     this.initSocket();
-    this.setSocketId();
     this.setCurrentRooms([{name: 'dummy', gameId: 2}]);
+  }
+
+  getSocket(): any {
+    return of(this.socket);
   }
 
   emit(path: string, data?: any): void {
     this.socket.emit(path, data);
   }
 
+  joinRoom(): any {
+    return of(this.socket);
+  }
+
+
   getCurrentRooms(): Observable<any> {
     return of(this.currentRooms);
   }
 
+
   initSocket(): void {
     this.socket = io.connect(this.url);
-
-    this.socket.emit('getCurrentRooms');
-
-    this.socket.on('currentRooms', (rooms) => {
-      this.onCurrentRoomsChange$.emit(rooms);
-      this.setCurrentRooms(rooms);
-    });
   }
 
   initRoom(data: any): void {
@@ -56,11 +51,5 @@ export class SocketService {
 
   private setCurrentRooms(currentRooms: Array<any>): void {
     this.currentRooms = currentRooms;
-  }
-
-  private setSocketId(): void {
-    setTimeout(() => {
-      this.socketId = this.socket.id;
-    });
   }
 }

@@ -1,5 +1,13 @@
 # CommuneGames
 
+
+This is my idea to create a suite of socket based games for friends to play together in 'rooms'
+
+Steps to run locally:
+nodemon server.js
+ng build --watch
+
+
 Developing various social games to play of socket.io rooms.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.3.
