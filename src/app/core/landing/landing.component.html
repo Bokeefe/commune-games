@@ -6,7 +6,6 @@
     <label for="currentRooms">Select from Current Teams</label>
 
     <select (change)="onRoomSelect($event)" formControlName="currentRooms" class="form-control" id="currentRooms">
-
       <option value="">-- pick from current rooms --</option>
       <option *ngFor="let room of currentRooms" [value]="room">{{room}}</option>
     </select>

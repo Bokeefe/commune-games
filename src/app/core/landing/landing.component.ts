@@ -7,6 +7,7 @@ import { FormGroup, FormControl, Validators, ValidatorFn} from '@angular/forms';
 import { SocketService } from './../../shared/socket.service';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/shared/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-landing',
@@ -15,9 +16,8 @@ import { UserService } from 'src/app/shared/user.service';
 })
 export class LandingComponent implements OnInit {
   currentRooms: any;
-
+  currentRoomsSub: Subscription;
   errorMessages: any;
-
   landingForm: FormGroup;
   socket: any;
 
@@ -36,8 +36,8 @@ export class LandingComponent implements OnInit {
   ngOnInit() {
     this._ioService.getSocket().subscribe((socket) => {this.socket = socket; });
     this.socket.emit('getCurrentRooms');
-    this.socket.on('currentRooms', (currentRooms) => {
-      console.log(currentRooms)
+    this.currentRoomsSub = this.socket.on('currentRooms', (currentRooms) => {
+      console.log(currentRooms);
       this.currentRooms = currentRooms;
     });
 
@@ -63,7 +63,7 @@ export class LandingComponent implements OnInit {
       };
 
       console.log(roomObj);
-      this._ioService.emit('addPlayer', roomObj);
+      this._ioService.emit('joinRoom', roomObj);
       this._roomService.setCurrentRoom(roomObj.roomName);
       this.router.navigate(['room']);
     } else if (this.landingForm.valid && this.landingForm.value['newRoom']) {

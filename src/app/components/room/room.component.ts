@@ -34,18 +34,17 @@ export class RoomComponent implements OnInit {
       this.socket = socket;
     });
 
-    this.socket.on('updateRoom', (room) => {
-      this.room = room;
-      this.players = room.players;
+    this.socket.on('message', (data) => {
+      console.log(data);
     });
-    
-    this.socket.on('testRoom', (msg) => {
-      console.log(msg);
-    });
-  }
 
-  test(): void {
-    this.socket.emit('test', 'eaxample');
+    console.log(this.roomName, this.user);
+    this.socket.emit('joinRoom', {
+      roomName: this.roomName,
+      callSign: this.user
+    }).subscribe((data) => {
+      console.log(data);
+    });
   }
 
   private setUser(user: string): void {

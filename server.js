@@ -15,6 +15,7 @@ io.on('connection', function(socket) {
   socket.emit('currentRooms', currentRooms);
 
 	socket.on('joinRoom', function(req, callback) {
+		console.log(req);
 		if (req.roomName.replace(/\s/g, "").length > 0 && req.callSign.replace(/\s/g, "").length > 0) {
 			var nameTaken = false;
 
@@ -31,16 +32,22 @@ io.on('connection', function(socket) {
 					error: 'Sorry this callSign is taken!'
 				});
 			} else {
-        connectedUsers[socket.id] = req;
-        currentRooms.push(req.roomName);
-        console.log(currentRooms);
-        socket.join(req.roomName);
-        
-				socket.broadcast.to(req.roomName).emit('message', {
-					callSign: 'System',
-					text: req.callSign + ' has joined!',
-					timestamp: moment().valueOf()
-				}),() => {
+		connectedUsers[socket.id] = req;
+
+		if(!currentRooms.includes(req.roomName)){
+			currentRooms.push(req.roomName);
+		}
+		
+		socket.join(req.roomName);
+		socket.emit('currentRooms', currentRooms);
+		socket.emit('updateRoom', currentRooms[req.roomName]);
+
+
+		socket.broadcast.to(req.roomName).emit('message', {
+			callSign: 'System',
+			text: req.callSign + ' has joined!',
+			timestamp: moment().valueOf()
+		}),() => {
           nameAvailable = true;
         }
 			}
