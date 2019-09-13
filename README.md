@@ -1,12 +1,9 @@
 # CommuneGames
 
-
 This is my idea to create a suite of socket based games for friends to play together in 'rooms'
 
 Steps to run locally:
-nodemon server.js
-ng build --watch
-
+npm start
 
 Developing various social games to play of socket.io rooms.
 

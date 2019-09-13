@@ -12,7 +12,6 @@ import { HttpClientService } from 'src/app/shared/http-client.service';
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit {
-
   roomName: string;
   room: any;
   players: any;
@@ -20,21 +19,23 @@ export class RoomComponent implements OnInit {
   user: string;
   socket: any;
 
-  constructor(private _http: HttpClientService,
-              private _roomService: RoomService,
-              private _ioService: SocketService,
-              private _userService: UserService) {
-      this.setRoom(this._roomService.getCurrentRoom());
-      this.setUser(this._userService.getUser());
-      this.roomName = this._roomService.getCurrentRoom();
-   }
+  constructor(
+    private _http: HttpClientService,
+    private _roomService: RoomService,
+    private _ioService: SocketService,
+    private _userService: UserService
+  ) {
+    this.setRoom(this._roomService.getCurrentRoom());
+    this.setUser(this._userService.getUser());
+    this.roomName = this._roomService.getCurrentRoom();
+  }
 
   ngOnInit() {
-    this._ioService.getSocket().subscribe((socket) => {
+    this._ioService.getSocket().subscribe(socket => {
       this.socket = socket;
     });
 
-    this.socket.on('message', (data) => {
+    this.socket.on('message', data => {
       console.log(data);
     });
 
@@ -42,7 +43,9 @@ export class RoomComponent implements OnInit {
     this.socket.emit('joinRoom', {
       roomName: this.roomName,
       callSign: this.user
-    }).subscribe((data) => {
+    });
+
+    this.socket.on('updateRoom', data => {
       console.log(data);
     });
   }

@@ -1,7 +1,7 @@
 import { RoomService } from './../../shared/room.service';
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, Validators, ValidatorFn} from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 
 // services
 import { SocketService } from './../../shared/socket.service';
@@ -21,26 +21,28 @@ export class LandingComponent implements OnInit {
   landingForm: FormGroup;
   socket: any;
 
-  constructor(private _ioService: SocketService,
-              private _roomService: RoomService,
-              private router: Router,
-              private _userService: UserService) {
+  constructor(
+    private _ioService: SocketService,
+    private _roomService: RoomService,
+    private router: Router,
+    private _userService: UserService
+  ) {
     this.initForm();
     this.errorMessages = {
       currentRooms: '',
       newRoom: '',
-      callSign: '',
+      callSign: ''
     };
   }
 
   ngOnInit() {
-    this._ioService.getSocket().subscribe((socket) => {this.socket = socket; });
+    this._ioService.getSocket().subscribe(socket => {
+      this.socket = socket;
+    });
     this.socket.emit('getCurrentRooms');
-    this.currentRoomsSub = this.socket.on('currentRooms', (currentRooms) => {
-      console.log(currentRooms);
+    this.currentRoomsSub = this.socket.on('currentRooms', currentRooms => {
       this.currentRooms = currentRooms;
     });
-
   }
 
   onKeydown(event: any): void {
@@ -54,50 +56,43 @@ export class LandingComponent implements OnInit {
   }
 
   onSubmit(event: any): void {
-    if (this.landingForm.valid && !this.landingForm.value['newRoom']) {
-      console.log('existing room');
-
-      const roomObj = {
-        roomName: this.landingForm.value['currentRooms'],
-        callSign: this.landingForm.value['callSign']
-      };
-
-      console.log(roomObj);
-      this._ioService.emit('joinRoom', roomObj);
-      this._roomService.setCurrentRoom(roomObj.roomName);
-      this.router.navigate(['room']);
-    } else if (this.landingForm.valid && this.landingForm.value['newRoom']) {
-      console.log('new room');
-
-      const roomObj = {
-        roomName: this.landingForm.value['newRoom'],
-        callSign: this.landingForm.value['callSign']
-      };
-
-      this._ioService.emit('joinRoom', roomObj );
-      this._roomService.setCurrentRoom(roomObj.roomName);
-      this._userService.setUser(roomObj.callSign);
-      this.router.navigate(['room']);
-    } else {
-      for (const key in this.landingForm['controls']) {
-        if (this.landingForm['controls'].hasOwnProperty(key)) {
-          if (!!this.landingForm.controls[key].errors) {
-            this.setErrorMessage(key, 'You missed a required field');
-          }
-        }
+    console.log({
+      roomName: this.landingForm.get('newRoom').value.length
+        ? this.landingForm.value['newRoom'].trim()
+        : this.landingForm.value['currenRooms'].trim(),
+      callSign: this.landingForm.value['callSign'].trim()
+    });
+    this.socket.emit(
+      {
+        roomName: this.landingForm.get('newRoom').value.length
+          ? this.landingForm.value['newRoom'].trim()
+          : this.landingForm.value['currenRooms'].trim(),
+        callSign: this.landingForm.value['callSign'].trim()
+      },
+      res => {
+        console.log(res);
       }
-    }
+    );
   }
 
   private customValidation(): ValidatorFn {
     let isValid;
 
-    if (!!this.landingForm.value['currenRooms'].value && !!this.landingForm.value['newRoom'].value) {
+    if (
+      !!this.landingForm.value['currenRooms'].value &&
+      !!this.landingForm.value['newRoom'].value
+    ) {
       this.setErrorMessage('currentRoom', 'please either create a new room OR an existing one');
       isValid = false;
-    } else if (!!this.landingForm.value['currenRooms'].value && this.landingForm.value['newRoom'].value) {
+    } else if (
+      !!this.landingForm.value['currenRooms'].value &&
+      this.landingForm.value['newRoom'].value
+    ) {
       isValid = true;
-    } else if (this.landingForm.value['currenRooms'].value && !!this.landingForm.value['newRoom'].value) {
+    } else if (
+      this.landingForm.value['currenRooms'].value &&
+      !!this.landingForm.value['newRoom'].value
+    ) {
       isValid = true;
     }
 
@@ -106,8 +101,8 @@ export class LandingComponent implements OnInit {
 
   private initForm(): void {
     this.landingForm = new FormGroup({
-      currentRooms: new FormControl('', ),
-      newRoom: new FormControl('', ),
+      currentRooms: new FormControl(''),
+      newRoom: new FormControl(''),
       callSign: new FormControl('', Validators.required)
     });
   }
