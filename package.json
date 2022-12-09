@@ -23,7 +23,7 @@
     "angular-material-icons": "^0.7.1",
     "bootstrap": "^4.2.1",
     "core-js": "^2.5.4",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "jquery": "^1.9.1",
     "ngx-socket-io": "^2.1.1",
     "popper.js": "^1.14.6",
